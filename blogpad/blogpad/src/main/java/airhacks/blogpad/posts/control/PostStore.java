@@ -40,7 +40,17 @@ public class PostStore {
         Files.writeString(path, content);
     }
 
-    String read(String fileName) throws IOException {
+    public Post read(String fileName) throws IOException {
+        String stringified = this.readString(fileName);
+        return deserialize(stringified);
+    }
+
+    Post deserialize(String stringified){
+        Jsonb jsonb = JsonbBuilder.create();
+        return jsonb.fromJson(stringified, Post.class);
+    }
+
+    String readString(String fileName) throws IOException {
         Path path = this.storageDirectoryPath.resolve(fileName);
         return Files.readString(path);
     }
