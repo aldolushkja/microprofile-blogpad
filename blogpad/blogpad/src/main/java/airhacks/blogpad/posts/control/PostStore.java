@@ -20,14 +20,18 @@ public class PostStore {
     Path storageDirectoryPath;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         this.storageDirectoryPath = Path.of(this.storageDir);
     }
 
-    public void save(Post post) throws IOException {
+    public void save(Post post) {
         String fileName = post.title;
         String stringified = serialize(post);
-        write(fileName, stringified);
+        try {
+            write(fileName, stringified);
+        } catch (IOException e){
+            throw new IllegalStateException("Canno save post " + fileName);
+        }
     }
 
     String serialize(Post post) {
@@ -45,7 +49,7 @@ public class PostStore {
         return deserialize(stringified);
     }
 
-    Post deserialize(String stringified){
+    Post deserialize(String stringified) {
         Jsonb jsonb = JsonbBuilder.create();
         return jsonb.fromJson(stringified, Post.class);
     }
