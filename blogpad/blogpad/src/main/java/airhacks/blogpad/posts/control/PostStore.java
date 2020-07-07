@@ -10,6 +10,17 @@ import java.nio.file.Path;
 
 public class PostStore {
 
+    public void save(Post post) throws IOException {
+        String fileName = post.title;
+        String stringified = serialize(post);
+        write(fileName, stringified);
+    }
+
+    String serialize(Post post){
+        Jsonb jsonb = JsonbBuilder.create();
+        return jsonb.toJson(post);
+    }
+
     void write(String fileName, String content) throws IOException {
         Path path = Path.of(fileName);
         Files.writeString(path, content);
@@ -18,10 +29,5 @@ public class PostStore {
     String read(String fileName) throws IOException {
         Path path = Path.of(fileName);
         return Files.readString(path);
-    }
-
-    public String serialize(Post post){
-        Jsonb jsonb = JsonbBuilder.create();
-        return jsonb.toJson(post);
     }
 }

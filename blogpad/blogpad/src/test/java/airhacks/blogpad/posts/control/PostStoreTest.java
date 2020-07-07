@@ -34,4 +34,9 @@ public class PostStoreTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void savePost() throws IOException {
+        this.cut.save(new Post("target/first","hey,duke"));
+    }
+
 }
