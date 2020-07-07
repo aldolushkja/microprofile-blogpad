@@ -4,6 +4,8 @@ import airhacks.blogpad.posts.entity.Post;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PostStoreTest {
@@ -20,5 +22,10 @@ public class PostStoreTest {
         String stringified = this.cut.serialize(new Post("Hello", "World"));
         assertNotNull(stringified);
         System.out.println("->" + stringified);
+    }
+
+    @Test
+    public void writeString() throws IOException {
+        this.cut.write("target/firstPost", "hello, duke");
     }
 }
