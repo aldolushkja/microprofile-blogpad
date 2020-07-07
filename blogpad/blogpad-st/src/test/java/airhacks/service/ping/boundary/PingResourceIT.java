@@ -1,12 +1,14 @@
 package airhacks.service.ping.boundary;
-import java.net.URI;
-import javax.ws.rs.core.Response;
-import org.eclipse.microprofile.rest.client.RestClientBuilder;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.ws.rs.core.Response;
+import java.net.URI;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  *
@@ -18,7 +20,7 @@ public class PingResourceIT {
 
     @BeforeEach
     public void init() {
-        URI uri = URI.create("http://localhost:8080/blogpad/resources/");
+        URI uri = URI.create("http://localhost:9080/blogpad/resources/");
         this.client = RestClientBuilder.
                 newBuilder().
                 baseUri(uri).
