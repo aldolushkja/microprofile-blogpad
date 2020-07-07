@@ -16,6 +16,8 @@ public class PostStoreTest {
     @BeforeEach
     public void init() {
         this.cut = new PostStore();
+        this.cut.storageDir = "target";
+        this.cut.init();
     }
 
     @Test
@@ -27,7 +29,7 @@ public class PostStoreTest {
 
     @Test
     public void writeString() throws IOException {
-        String path = "target/nextPost";
+        String path = "nextPost";
         String expected = "hello, duke";
         this.cut.write(path, expected);
         String actual = this.cut.read(path);
@@ -36,7 +38,7 @@ public class PostStoreTest {
 
     @Test
     public void savePost() throws IOException {
-        this.cut.save(new Post("target/first","hey,duke"));
+        this.cut.save(new Post("first","hey,duke"));
     }
 
 }
