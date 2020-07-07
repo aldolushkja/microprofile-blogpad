@@ -1,6 +1,6 @@
 /target
-.class
-
+*.class
+*.xml
 *.jar
 *.war
 *.ear
