@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class PostStoreTest {
@@ -13,12 +14,12 @@ public class PostStoreTest {
     private PostStore cut;
 
     @BeforeEach
-    public void init(){
+    public void init() {
         this.cut = new PostStore();
     }
 
     @Test
-    public void serialize(){
+    public void serialize() {
         String stringified = this.cut.serialize(new Post("Hello", "World"));
         assertNotNull(stringified);
         System.out.println("->" + stringified);
@@ -26,6 +27,11 @@ public class PostStoreTest {
 
     @Test
     public void writeString() throws IOException {
-        this.cut.write("target/firstPost", "hello, duke");
+        String path = "target/nextPost";
+        String expected = "hello, duke";
+        this.cut.write(path, expected);
+        String actual = this.cut.read(path);
+        assertEquals(expected, actual);
     }
+
 }

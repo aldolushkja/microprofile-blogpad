@@ -15,6 +15,11 @@ public class PostStore {
         Files.writeString(path, content);
     }
 
+    String read(String fileName) throws IOException {
+        Path path = Path.of(fileName);
+        return Files.readString(path);
+    }
+
     public String serialize(Post post){
         Jsonb jsonb = JsonbBuilder.create();
         return jsonb.toJson(post);
