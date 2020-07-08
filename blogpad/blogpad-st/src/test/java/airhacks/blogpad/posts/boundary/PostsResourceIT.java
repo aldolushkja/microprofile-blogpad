@@ -53,6 +53,12 @@ public class PostsResourceIT {
                 .build();
         this.client.save(post);
 
+        Response response = this.client.findPost("-");
+        int status = response.getStatus();
+        assertEquals(200, status);
+
+
+
     }
 
 }
