@@ -1,4 +1,4 @@
-package airhacks.service.ping.boundary;
+package airhacks.blogpad.posts.boundary;
 
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.junit.jupiter.api.BeforeEach;
