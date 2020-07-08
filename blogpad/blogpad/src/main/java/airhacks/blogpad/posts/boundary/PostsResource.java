@@ -2,6 +2,7 @@ package airhacks.blogpad.posts.boundary;
 
 import airhacks.blogpad.posts.control.PostStore;
 import airhacks.blogpad.posts.entity.Post;
+import org.eclipse.microprofile.metrics.annotation.Counted;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -13,6 +14,7 @@ public class PostsResource {
     @Inject
     PostStore store;
 
+    @Counted
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     public void save(Post post) {
