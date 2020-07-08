@@ -30,7 +30,7 @@ public class PostStore {
         try {
             write(fileName, stringified);
         } catch (IOException e){
-            throw new IllegalStateException("Canno save post " + fileName);
+            throw new IllegalStateException("Cannot save post " + fileName);
         }
     }
 

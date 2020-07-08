@@ -31,13 +31,19 @@ public class PostsResourceIT {
 
     @Test
     public void save() {
+        String title = "remote_hello";
         JsonObject post = Json.createObjectBuilder()
-                .add("title", "remote_hello")
+                .add("title", title)
                 .add("content", "first st")
                 .build();
         Response response = this.client.save(post);
         int status = response.getStatus();
         assertEquals(204, status);
+
+        response = this.client.findPost(title);
+        status = response.getStatus();
+        assertEquals(200, status);
         
     }
+
 }
