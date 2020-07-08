@@ -6,12 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author airhacks.com
@@ -27,7 +25,6 @@ public class PostsResourceIT {
                 newBuilder().
                 baseUri(uri).
                 build(PostsResourceClient.class);
-
     }
 
     @Test
@@ -54,12 +51,8 @@ public class PostsResourceIT {
                 .add("title", title)
                 .add("content", "first st")
                 .build();
-        try {
-            this.client.save(post);
-            fail("Invalid title should not be stored");
-        } catch (WebApplicationException ex) {
+        this.client.save(post);
 
-        }
     }
 
 }

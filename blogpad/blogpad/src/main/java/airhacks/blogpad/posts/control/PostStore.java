@@ -5,7 +5,6 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,12 +24,28 @@ public class PostStore {
     }
 
     public void save(Post post) {
-        var fileName = post.title;
+        var fileName = this.normalize(post.title);
         var stringified = serialize(post);
         try {
             write(fileName, stringified);
-        } catch (IOException ex){
-            throw new StorageException("Cannot save post: " + fileName,ex);
+        } catch (IOException ex) {
+            throw new StorageException("Cannot save post: " + fileName, ex);
+        }
+    }
+
+    String normalize(String title) {
+        return title.
+                codePoints().
+                map(this::replaceWithDigitOrLetter).
+                collect(StringBuffer::new, StringBuffer::appendCodePoint, StringBuffer::append)
+                .toString();
+    }
+
+    int replaceWithDigitOrLetter(int codePoint) {
+        if (Character.isLetterOrDigit(codePoint)) {
+            return codePoint;
+        } else {
+            return "-".codePoints().findFirst().orElseThrow();
         }
     }
 
@@ -48,8 +63,8 @@ public class PostStore {
         try {
             var stringified = this.readString(fileName);
             return deserialize(stringified);
-        } catch (IOException ex){
-            throw new StorageException("Cannot fetch post: " + fileName,ex);
+        } catch (IOException ex) {
+            throw new StorageException("Cannot fetch post: " + fileName, ex);
         }
     }
 
