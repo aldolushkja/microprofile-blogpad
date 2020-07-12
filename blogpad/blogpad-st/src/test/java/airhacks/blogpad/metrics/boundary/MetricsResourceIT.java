@@ -26,7 +26,7 @@ public class MetricsResourceIT {
 
     @BeforeEach
     public void init() {
-        URI uri = URI.create("http://localhost:9080/");
+        URI uri = URI.create("http://localhost:8282/");
         this.client = RestClientBuilder.
                 newBuilder().
                 baseUri(uri).
