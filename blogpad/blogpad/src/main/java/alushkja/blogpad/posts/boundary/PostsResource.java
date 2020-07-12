@@ -5,6 +5,7 @@ import alushkja.blogpad.posts.entity.Post;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -21,7 +22,7 @@ public class PostsResource {
     @Counted
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createNew(@Context UriInfo uriInfo, Post post) {
+    public Response createNew(@Context UriInfo uriInfo, @Valid Post post) {
         Post postWithFilename = this.store.createNew(post);
         URI uri = uriInfo.getAbsolutePathBuilder().path(postWithFilename.fileName).build();
         return Response.created(uri).build();
@@ -30,7 +31,7 @@ public class PostsResource {
     @Counted
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response update(@Context UriInfo uriInfo, Post post) {
+    public Response update(@Context UriInfo uriInfo, @Valid Post post) {
         this.store.update(post);
         return Response.ok().build();
     }
