@@ -26,11 +26,13 @@ public class PostStore {
         this.storageDirectoryPath = Path.of(this.storageDir);
     }
 
-    public void save(Post post) {
+    public Post save(Post post) {
         var fileName = this.normalizer.normalize(post.title);
         var stringified = serialize(post);
         try {
+            post.fileName = fileName;
             write(fileName, stringified);
+            return post;
         } catch (IOException ex) {
             throw new StorageException("Cannot save post: " + fileName, ex);
         }

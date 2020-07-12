@@ -6,7 +6,11 @@ import org.eclipse.microprofile.metrics.annotation.Counted;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 
 @Path("posts")
 public class PostsResource {
@@ -17,8 +21,10 @@ public class PostsResource {
     @Counted
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    public void save(Post post) {
-        this.store.save(post);
+    public Response save(@Context UriInfo uriInfo, Post post) {
+        Post postWithFilename = this.store.save(post);
+        URI uri = uriInfo.getAbsolutePathBuilder().path(postWithFilename.fileName).build();
+        return Response.created(uri).build();
     }
 
     @GET
