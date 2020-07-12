@@ -19,12 +19,20 @@ public class PostsResource {
     PostStore store;
 
     @Counted
-    @PUT
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response save(@Context UriInfo uriInfo, Post post) {
-        Post postWithFilename = this.store.save(post);
+    public Response createNew(@Context UriInfo uriInfo, Post post) {
+        Post postWithFilename = this.store.createNew(post);
         URI uri = uriInfo.getAbsolutePathBuilder().path(postWithFilename.fileName).build();
         return Response.created(uri).build();
+    }
+
+    @Counted
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response update(@Context UriInfo uriInfo, Post post) {
+        this.store.update(post);
+        return Response.ok().build();
     }
 
     @GET

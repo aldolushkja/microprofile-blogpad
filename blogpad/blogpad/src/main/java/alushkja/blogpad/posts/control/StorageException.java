@@ -11,4 +11,10 @@ public class StorageException extends WebApplicationException {
                 .header("cause", cause.getMessage())
                 .build());
     }
+
+    public StorageException(String message) {
+        super(Response.status(400)
+                .header("message", message)
+                .build());
+    }
 }
