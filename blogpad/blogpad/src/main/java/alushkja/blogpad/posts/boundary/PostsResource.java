@@ -1,7 +1,7 @@
-package airhacks.blogpad.posts.boundary;
+package alushkja.blogpad.posts.boundary;
 
-import airhacks.blogpad.posts.control.PostStore;
-import airhacks.blogpad.posts.entity.Post;
+import alushkja.blogpad.posts.control.PostStore;
+import alushkja.blogpad.posts.entity.Post;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 
 import javax.inject.Inject;

@@ -1,4 +1,4 @@
-package airhacks.service;
+package alushkja.service;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

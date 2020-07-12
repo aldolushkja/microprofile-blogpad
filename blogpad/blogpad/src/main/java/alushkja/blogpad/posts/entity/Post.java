@@ -1,4 +1,4 @@
-package airhacks.blogpad.posts.entity;
+package alushkja.blogpad.posts.entity;
 
 public class Post {
 

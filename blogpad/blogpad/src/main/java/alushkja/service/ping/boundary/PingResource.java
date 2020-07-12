@@ -1,4 +1,4 @@
-package airhacks.service.ping.boundary;
+package alushkja.service.ping.boundary;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 

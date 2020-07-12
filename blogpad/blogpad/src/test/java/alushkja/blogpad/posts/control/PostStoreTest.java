@@ -1,6 +1,6 @@
-package airhacks.blogpad.posts.control;
+package alushkja.blogpad.posts.control;
 
-import airhacks.blogpad.posts.entity.Post;
+import alushkja.blogpad.posts.entity.Post;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
