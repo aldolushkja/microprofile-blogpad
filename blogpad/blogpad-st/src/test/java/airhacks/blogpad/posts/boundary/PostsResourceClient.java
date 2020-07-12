@@ -8,9 +8,13 @@ import javax.ws.rs.core.Response;
 @Path("posts")
 public interface PostsResourceClient {
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    Response createNew(JsonObject post);
+
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    Response save(JsonObject post);
+    Response update(JsonObject post);
 
     @GET
     @Path("{title}")

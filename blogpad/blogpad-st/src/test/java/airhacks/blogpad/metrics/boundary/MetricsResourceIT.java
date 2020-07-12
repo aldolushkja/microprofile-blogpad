@@ -21,7 +21,7 @@ public class MetricsResourceIT {
     public static void initMetricsWithBusinessCall(){
         var test = new PostsResourceIT();
         test.init();
-        test.save();
+        test.createNew();
     }
 
     @BeforeEach
@@ -48,7 +48,7 @@ public class MetricsResourceIT {
         assertFalse(metrics.isEmpty());
         System.out.println("metrics from server : " + metrics);
         int saveInvocationCounter = metrics
-                .getJsonNumber("alushkja.blogpad.posts.boundary.PostsResource.save").intValue();
+                .getJsonNumber("alushkja.blogpad.posts.boundary.PostsResource.createNew").intValue();
 
         assertTrue(saveInvocationCounter >= 0);
     }

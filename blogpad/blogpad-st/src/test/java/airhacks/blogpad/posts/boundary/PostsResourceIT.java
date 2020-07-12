@@ -28,15 +28,32 @@ public class PostsResourceIT {
     }
 
     @Test
-    public void save() {
-        String title = "remote_hello";
+    public void createNew() {
+        String title = "Test/purpose";
         JsonObject post = Json.createObjectBuilder()
                 .add("title", title)
                 .add("content", "first st")
                 .build();
-        Response response = this.client.save(post);
+        Response response = this.client.createNew(post);
         int status = response.getStatus();
-        assertEquals(204, status);
+        assertEquals(201, status);
+
+        response = this.client.findPost(title);
+        status = response.getStatus();
+        assertEquals(200, status);
+
+    }
+
+    @Test
+    public void updatePost() {
+        String title = "Test/purpose";
+        JsonObject post = Json.createObjectBuilder()
+                .add("title", title)
+                .add("content", "updated content 2")
+                .build();
+        Response response = this.client.update(post);
+        int status = response.getStatus();
+        assertEquals(201, status);
 
         response = this.client.findPost(title);
         status = response.getStatus();
@@ -51,7 +68,7 @@ public class PostsResourceIT {
                 .add("title", title)
                 .add("content", "first st")
                 .build();
-        this.client.save(post);
+        this.client.createNew(post);
 
         Response response = this.client.findPost("-");
         int status = response.getStatus();

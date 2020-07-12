@@ -67,7 +67,8 @@ public class PostStore {
         Files.writeString(path, content);
     }
 
-    public Post read(String fileName) {
+    public Post read(String title) {
+        var fileName = this.normalizer.normalize(title);
         try {
             var stringified = this.readString(fileName);
             return deserialize(stringified);
