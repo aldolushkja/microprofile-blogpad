@@ -6,6 +6,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.json.bind.JsonbBuilder;
+import javax.ws.rs.BadRequestException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,7 +30,7 @@ public class PostStore {
     public Post createNew(Post post) {
         var fileName = this.normalizer.normalize(post.title);
         if(this.fileExists(fileName)){
-            throw new StorageException("Post with name: " + fileName + " already exists");
+            throw new BadRequestException("Post with name: " + fileName + " already exists, use PUT for updates");
         }
         post.setCreatedAt();
         post.fileName = fileName;
@@ -49,6 +50,9 @@ public class PostStore {
 
     public void update(Post post) {
         var fileName = this.normalizer.normalize(post.title);
+        if(!this.fileExists(fileName)){
+            throw new BadRequestException("Post with name: " + fileName + " does not exists, use POST to create");
+        }
         post.updateModifiedAt();
         var stringified = serialize(post);
         try {
