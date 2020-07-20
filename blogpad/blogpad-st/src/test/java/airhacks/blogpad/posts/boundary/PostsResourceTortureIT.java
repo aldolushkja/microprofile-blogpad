@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
@@ -15,8 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PostsResourceTortureIT {
     private PostsResourceClient client;
@@ -47,10 +47,25 @@ public class PostsResourceTortureIT {
 
     @Test
     public void startTorture() {
-        List<CompletableFuture<Void>> tasks = Stream.generate(() -> CompletableFuture.runAsync(this::findPost, this.threadPool)).
+        List<CompletableFuture<Void>> tasks = Stream.
+                generate(this::runScenario).
                 limit(500).
                 collect(Collectors.toList());
         tasks.forEach(CompletableFuture::join);
+    }
+
+    CompletableFuture<Void> runScenario() {
+        return CompletableFuture.runAsync(this::findPost, this.threadPool).
+                thenRunAsync(this::findNonExistingPost, this.threadPool);
+    }
+
+    void findNonExistingPost() {
+        Response response = null;
+        try {
+            response = this.client.findPost("not-existing" + System.nanoTime());
+            fail("Shold not exists");
+        } catch (WebApplicationException e) {
+        }
     }
 
     public void findPost() {
