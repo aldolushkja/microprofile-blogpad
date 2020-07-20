@@ -1,5 +1,6 @@
 package airhacks.blogpad.posts.boundary;
 
+import airhacks.blogpad.metrics.boundary.MetricsResourceClient;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,9 @@ public class PostsResourceTortureIT {
     private String title;
     private ExecutorService threadPool;
 
+    private MetricsResourceClient metricsClient;
+
+
     @BeforeEach
     public void init() {
         URI uri = URI.create("http://localhost:8282/blogpad/resources/");
@@ -41,7 +45,16 @@ public class PostsResourceTortureIT {
         assertEquals(201, status);
 
         this.threadPool = Executors.newFixedThreadPool(20);
+        this.initMetricsEndpoint();
 
+    }
+
+    void initMetricsEndpoint() {
+        URI uri = URI.create("http://localhost:8282/");
+        this.metricsClient = RestClientBuilder.
+                newBuilder().
+                baseUri(uri).
+                build(MetricsResourceClient.class);
     }
 
 
@@ -52,6 +65,7 @@ public class PostsResourceTortureIT {
                 limit(500).
                 collect(Collectors.toList());
         tasks.forEach(CompletableFuture::join);
+        verifyPerformance();
     }
 
     CompletableFuture<Void> runScenario() {
@@ -72,6 +86,13 @@ public class PostsResourceTortureIT {
         Response response = this.client.findPost(this.title);
         JsonObject post = response.readEntity(JsonObject.class);
         assertNotNull(post);
+    }
+
+    void verifyPerformance() {
+        JsonObject findOperationResult = this.metricsClient.applicationMetrics().getJsonObject("alushkja.blogpad.posts.boundary.PostsResource.findPost");
+        double oneMinRate = findOperationResult.getJsonNumber("oneMinRate").doubleValue();
+        System.out.println("--------- oneMinRate " + oneMinRate);
+        assertTrue(oneMinRate > 5);
     }
 
 
