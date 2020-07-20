@@ -3,6 +3,7 @@ package alushkja.blogpad.posts.boundary;
 import alushkja.blogpad.posts.control.PostStore;
 import alushkja.blogpad.posts.entity.Post;
 import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 
 import javax.inject.Inject;
@@ -39,6 +40,7 @@ public class PostsResource {
         return Response.ok().build();
     }
 
+    @Timed
     @GET
     @Path("{title}")
     @Produces(MediaType.APPLICATION_JSON)
