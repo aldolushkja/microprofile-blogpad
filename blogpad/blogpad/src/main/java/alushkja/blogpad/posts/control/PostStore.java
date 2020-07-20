@@ -2,8 +2,12 @@ package alushkja.blogpad.posts.control;
 
 import alushkja.blogpad.posts.entity.Post;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.health.HealthCheck;
+import org.eclipse.microprofile.health.HealthCheckResponse;
+import org.eclipse.microprofile.health.Liveness;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.BadRequestException;
@@ -13,82 +17,90 @@ import java.nio.file.Path;
 
 public class PostStore {
 
-	@Inject
-	@ConfigProperty(name = "root.storage.dir")
-	String storageDir;
+    @Inject
+    @ConfigProperty(name = "root.storage.dir")
+    String storageDir;
 
-	@Inject
-	TitleNormalizer normalizer;
+    @Inject
+    TitleNormalizer normalizer;
 
-	Path storageDirectoryPath;
+    Path storageDirectoryPath;
 
-	@PostConstruct
-	public void init() {
-		this.storageDirectoryPath = Path.of(this.storageDir);
-	}
+    @PostConstruct
+    public void init() {
+        this.storageDirectoryPath = Path.of(this.storageDir);
+    }
 
-	public Post createNew(Post post) {
-		var fileName = this.normalizer.normalize(post.title);
-		if (this.fileExists(fileName)) {
-			throw new BadRequestException("Post with name: " + fileName + " already exists, use PUT for updates");
-		}
-		post.setCreatedAt();
-		post.fileName = fileName;
-		var stringified = serialize(post);
-		try {
-			write(fileName, stringified);
-			return post;
-		} catch (IOException ex) {
-			throw new StorageException("Cannot save post: " + fileName, ex);
-		}
-	}
+    @Produces
+    @Liveness
+    public HealthCheck checkPostsDirectoryExists() {
+        return () -> HealthCheckResponse.named("posts-directory-exists")
+                .state(Files.exists(this.storageDirectoryPath))
+                .build();
+    }
 
-	boolean fileExists(String fileName) {
-		var fqn = this.storageDirectoryPath.resolve(fileName);
-		return Files.exists(fqn);
-	}
+    public Post createNew(Post post) {
+        var fileName = this.normalizer.normalize(post.title);
+        if (this.fileExists(fileName)) {
+            throw new BadRequestException("Post with name: " + fileName + " already exists, use PUT for updates");
+        }
+        post.setCreatedAt();
+        post.fileName = fileName;
+        var stringified = serialize(post);
+        try {
+            write(fileName, stringified);
+            return post;
+        } catch (IOException ex) {
+            throw new StorageException("Cannot save post: " + fileName, ex);
+        }
+    }
 
-	public void update(Post post) {
-		var fileName = this.normalizer.normalize(post.title);
-		if (!this.fileExists(fileName)) {
-			throw new BadRequestException("Post with name: " + fileName + " does not exists, use POST to create");
-		}
-		post.updateModifiedAt();
-		var stringified = serialize(post);
-		try {
-			write(fileName, stringified);
-		} catch (IOException ex) {
-			throw new StorageException("Cannot save post: " + fileName, ex);
-		}
-	}
+    boolean fileExists(String fileName) {
+        var fqn = this.storageDirectoryPath.resolve(fileName);
+        return Files.exists(fqn);
+    }
 
-	String serialize(Post post) {
-		var jsonb = JsonbBuilder.create();
-		return jsonb.toJson(post);
-	}
+    public void update(Post post) {
+        var fileName = this.normalizer.normalize(post.title);
+        if (!this.fileExists(fileName)) {
+            throw new BadRequestException("Post with name: " + fileName + " does not exists, use POST to create");
+        }
+        post.updateModifiedAt();
+        var stringified = serialize(post);
+        try {
+            write(fileName, stringified);
+        } catch (IOException ex) {
+            throw new StorageException("Cannot save post: " + fileName, ex);
+        }
+    }
 
-	void write(String fileName, String content) throws IOException {
-		var path = this.storageDirectoryPath.resolve(fileName);
-		Files.writeString(path, content);
-	}
+    String serialize(Post post) {
+        var jsonb = JsonbBuilder.create();
+        return jsonb.toJson(post);
+    }
 
-	public Post read(String title) {
-		var fileName = this.normalizer.normalize(title);
-		try {
-			var stringified = this.readString(fileName);
-			return deserialize(stringified);
-		} catch (IOException ex) {
-			throw new StorageException("Cannot fetch post: " + fileName, ex);
-		}
-	}
+    void write(String fileName, String content) throws IOException {
+        var path = this.storageDirectoryPath.resolve(fileName);
+        Files.writeString(path, content);
+    }
 
-	Post deserialize(String stringified) {
-		var jsonb = JsonbBuilder.create();
-		return jsonb.fromJson(stringified, Post.class);
-	}
+    public Post read(String title) {
+        var fileName = this.normalizer.normalize(title);
+        try {
+            var stringified = this.readString(fileName);
+            return deserialize(stringified);
+        } catch (IOException ex) {
+            throw new StorageException("Cannot fetch post: " + fileName, ex);
+        }
+    }
 
-	String readString(String fileName) throws IOException {
-		var path = this.storageDirectoryPath.resolve(fileName);
-		return Files.readString(path);
-	}
+    Post deserialize(String stringified) {
+        var jsonb = JsonbBuilder.create();
+        return jsonb.fromJson(stringified, Post.class);
+    }
+
+    String readString(String fileName) throws IOException {
+        var path = this.storageDirectoryPath.resolve(fileName);
+        return Files.readString(path);
+    }
 }
