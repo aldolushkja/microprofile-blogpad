@@ -5,6 +5,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Liveness;
+import org.eclipse.microprofile.metrics.annotation.Gauge;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Produces;
@@ -54,7 +55,8 @@ public class PostStore {
                 .build();
     }
 
-    long getPostsStorageSpaceInMB() {
+    @Gauge(unit = "mb")
+    public long getPostsStorageSpaceInMB() {
         try {
             return Files.getFileStore(this.storageDirectoryPath).getUsableSpace() / 1024 / 1024;
         } catch (IOException e) {
