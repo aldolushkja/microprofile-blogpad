@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class PostsResourceTortureIT {
     private PostsResourceClient client;
@@ -60,6 +61,7 @@ public class PostsResourceTortureIT {
 
     @Test
     public void startTorture() {
+        assumeTrue(System.getProperty("torture",null) != null);
         List<CompletableFuture<Void>> tasks = Stream.
                 generate(this::runScenario).
                 limit(500).
