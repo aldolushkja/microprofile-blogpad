@@ -5,7 +5,9 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Liveness;
+import org.eclipse.microprofile.metrics.MetricRegistry;
 import org.eclipse.microprofile.metrics.annotation.Gauge;
+import org.eclipse.microprofile.metrics.annotation.RegistryType;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Produces;
@@ -28,6 +30,10 @@ public class PostStore {
 
     @Inject
     TitleNormalizer normalizer;
+
+    @Inject
+    @RegistryType(type = MetricRegistry.Type.APPLICATION)
+    MetricRegistry registry;
 
     Path storageDirectoryPath;
 
@@ -112,14 +118,20 @@ public class PostStore {
 
     public Post read(String title) {
         var fileName = this.normalizer.normalize(title);
-        if(!this.fileExists(fileName))
+        if (!this.fileExists(fileName)) {
+            this.increaseNotExistingPostCounter();
             return null;
+        }
         try {
             var stringified = this.readString(fileName);
             return deserialize(stringified);
         } catch (IOException ex) {
             throw new StorageException("Cannot fetch post: " + fileName, ex);
         }
+    }
+
+    void increaseNotExistingPostCounter() {
+        registry.counter("fetch_post_with_ne_title").inc();
     }
 
     Post deserialize(String stringified) {
