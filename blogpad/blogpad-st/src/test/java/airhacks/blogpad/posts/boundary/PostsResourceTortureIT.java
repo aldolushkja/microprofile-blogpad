@@ -24,7 +24,6 @@ public class PostsResourceTortureIT {
     private PostsResourceClient client;
     private String title;
     private ExecutorService threadPool;
-
     private MetricsResourceClient metricsClient;
 
 
@@ -71,14 +70,14 @@ public class PostsResourceTortureIT {
     }
 
     CompletableFuture<Void> runScenario() {
-        return CompletableFuture.runAsync(this::findPost, this.threadPool).
+        return CompletableFuture.
+                runAsync(this::findPost, this.threadPool).
                 thenRunAsync(this::findNonExistingPost, this.threadPool);
     }
 
     void findNonExistingPost() {
-        Response response = null;
         try {
-            response = this.client.findPost("not-existing" + System.nanoTime());
+            this.client.findPost("not-existing" + System.nanoTime());
             fail("Shold not exists");
         } catch (WebApplicationException e) {
         }
