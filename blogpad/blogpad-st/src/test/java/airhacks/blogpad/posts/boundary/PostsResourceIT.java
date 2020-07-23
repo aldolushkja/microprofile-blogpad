@@ -57,30 +57,32 @@ public class PostsResourceIT {
                 .add("title", title)
                 .add("content", "first st")
                 .build();
-        this.client.createNew(post);
+        var creationResponse = this.client.createNew(post);
+        assertEquals(201, creationResponse.getStatus());
 
-        Response response = this.client.findPost("-");
+        Response response = this.client.findPost(title.replace("/", "-"));
         int status = response.getStatus();
         assertEquals(200, status);
 
     }
 
-//    @Test
-//    public void updatePost() {
-//        String title = "Test/purpose11";
-//        JsonObject post = Json.createObjectBuilder()
-//                .add("title", title)
-//                .add("content", "updated content 2")
-//                .build();
-//        Response response = this.client.update(post);
-//        int status = response.getStatus();
-//        assertEquals(200, status);
-//
-//        response = this.client.findPost(title);
-//        status = response.getStatus();
-//        assertEquals(200, status);
-//
-//    }
+    @Test
+    public void fetchNonExistingTitle() {
+        var title = "ne" + System.nanoTime();
+        Response response = this.client.findPost(title);
+        int status = response.getStatus();
+        assertEquals(204, status);
+    }
+
+    @Test
+    public void fetchExistingTitle() {
+        var title = "initial";
+        Response response = this.client.findPost(title);
+        int status = response.getStatus();
+        assertEquals(200, status);
+        var post = response.readEntity(JsonObject.class);
+        assertTrue(title.equalsIgnoreCase(post.getString("title")));
+    }
 
     @Test
     public void saveWithTooShortTitle() {

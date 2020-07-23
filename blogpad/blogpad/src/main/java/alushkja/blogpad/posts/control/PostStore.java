@@ -112,6 +112,8 @@ public class PostStore {
 
     public Post read(String title) {
         var fileName = this.normalizer.normalize(title);
+        if(!this.fileExists(fileName))
+            return null;
         try {
             var stringified = this.readString(fileName);
             return deserialize(stringified);
