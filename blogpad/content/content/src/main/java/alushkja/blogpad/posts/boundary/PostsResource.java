@@ -5,6 +5,7 @@ import alushkja.blogpad.posts.entity.Post;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.opentracing.Traced;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -42,6 +43,7 @@ public class PostsResource {
 
     @Timed
     @GET
+    @Traced
     @Path("{title}")
     @Produces(MediaType.APPLICATION_JSON)
     public Post findPost(@PathParam("title") String title) {
