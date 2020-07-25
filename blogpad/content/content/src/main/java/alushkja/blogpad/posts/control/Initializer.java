@@ -5,14 +5,13 @@ import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Liveness;
 
-import javax.annotation.PostConstruct;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
-@Singleton
-@Startup
+@ApplicationScoped
 public class Initializer {
 
     static final String TITLE = "initial";
@@ -20,9 +19,8 @@ public class Initializer {
     @Inject
     PostStore store;
 
-    @PostConstruct
-    public void installFirstPost() {
-        if(this.postExists())
+    public void installFirstPost(@Observes @Initialized(ApplicationScoped.class) Object doesnMatter) {
+        if (this.postExists())
             return;
         var initialPost = this.createInitialPost();
         this.store.createNew(initialPost);
