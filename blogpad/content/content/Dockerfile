@@ -1,2 +1,2 @@
-FROM alushkja/glassfish
-COPY ./target/blogpad.war ${DEPLOYMENT_DIR}
+FROM airhacks/wildfly
+COPY ./target/content.war ${DEPLOYMENT_DIR}
