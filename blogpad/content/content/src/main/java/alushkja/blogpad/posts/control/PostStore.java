@@ -6,17 +6,20 @@ import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Liveness;
 import org.eclipse.microprofile.metrics.MetricRegistry;
-import org.eclipse.microprofile.metrics.annotation.Gauge;
 import org.eclipse.microprofile.metrics.annotation.RegistryType;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.json.bind.JsonbBuilder;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.BadRequestException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostStore {
 
@@ -36,7 +39,6 @@ public class PostStore {
     MetricRegistry registry;
 
     Path storageDirectoryPath;
-
 
     @PostConstruct
     public void init() {
@@ -61,7 +63,7 @@ public class PostStore {
                 .build();
     }
 
-//    @Gauge(unit = "mb")
+    //    @Gauge(unit = "mb")
     public long getPostsStorageSpaceInMB() {
         try {
             return Files.getFileStore(this.storageDirectoryPath).getUsableSpace() / 1024 / 1024;
@@ -83,6 +85,10 @@ public class PostStore {
             return post;
         } catch (IOException ex) {
             throw new StorageException("Cannot save post: " + fileName, ex);
+        } catch (ConstraintViolationException ex) {
+            var errorMessage = "Invalid Post";
+            var jsonResponse = JsonbBuilder.create();
+            throw new ConstaintViolationException(jsonResponse.toJson(buildConstraintResponse(ex, errorMessage)));
         }
     }
 
@@ -141,5 +147,17 @@ public class PostStore {
     String readString(String fileName) throws IOException {
         var path = this.storageDirectoryPath.resolve(fileName);
         return Files.readString(path);
+    }
+
+    public ConstraintResponse buildConstraintResponse(ConstraintViolationException violationExceptionSet, String errorMessage) {
+        List<ConstraitError> errors = new ArrayList<>();
+        for (ConstraintViolation<?> violations : violationExceptionSet.getConstraintViolations()) {
+            var propertyPath = violations.getPropertyPath().toString();
+            var message = violations.getMessage();
+            var constraintType = violations.getConstraintDescriptor().getAttributes().toString();
+            var invalidValue = violations.getInvalidValue().toString();
+            errors.add(new ConstraitError(propertyPath, message, constraintType, invalidValue));
+        }
+        return new ConstraintResponse(errorMessage, errors);
     }
 }

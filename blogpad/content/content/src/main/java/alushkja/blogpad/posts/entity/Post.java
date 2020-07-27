@@ -12,7 +12,7 @@ public class Post {
     public String fileName;
 
     @Schema(required = true, example = "openapi intro")
-    @Size(min = 3, max = 255)
+    @Size(min = 3, max = 255, message = "Titolo deve essere compreso tra min 3 caratteri e max 255 caratteri")
     public String title;
 
     @Schema(required = true, example = "how to use...")
